@@ -1,0 +1,2 @@
+{id = 1, nome = "Pfizer", prazo = 60, doses = 2}
+{id = 2, nome = "CoronaVac", prazo = 30, doses = 2}
