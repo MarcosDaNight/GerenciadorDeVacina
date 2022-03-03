@@ -13,12 +13,14 @@ import Models.Paciente
 
 import System.Directory
 import System.IO
+import Text.XHtml (action)
+import System.Console.Terminfo (cursorAddress)
 
-main:: IO()
-main = do
-    dataVacina <- openFile "../Data/Vacina.txt" ReadMode
-    vacina <- lines <$> hGetContents dataVacina
-    print vacina
+--main:: IO()
+--main = do
+  --  dataVacina <- openFile "../Data/Vacina.txt" ReadMode
+    --vacina <- lines <$> hGetContents dataVacina
+    --print vacina
 
 listaVacinasInicial :: [Vacina]
 listaVacinasInicial = []
@@ -26,6 +28,82 @@ listaVacinasInicial = []
 listaDatasVacinasInicial :: [String]
 listaDatasVacinasInicial = []
 
+--------------------------------TELA INICIAL----------------------------------
+opcoesTelaInicial :: [String]
+opcoesTelaInicial = ["Login", "Cadastro", "Sair"]
+
+doTelaInicial :: Integer -> [Char] -> IO ()
+doTelaInicial cursor action | action == "\ESC[B" = telaInicial ((cursor+1) `mod` 4)
+                                                   | action == "ESC[A" && cursor /= 0 = telaInicial (cursor-1)
+                                                   | action == "ESC[A" && cursor == 0 = telaInicial 3
+                                                   | action == "ESC[C" = mudarTelaInicial cursor
+                                                   | action == "ESC[D" = putStrLn(" \n                   Até Mais!             \n")
+                                                   | otherwise = telaInicial cursor
+                                                   
+
+mudarTelaInicial :: Integer -> IO()
+mudarTelaInicial cursor                          | cursor == 0 = do telaOpcoesLogin 0
+                                                 | cursor == 1 = do telaOpcoesLogin 0            
+                                                 | cursor == 2 = do telaOpcoesLogin 0
+
+
+
+telaInicial :: Integer -> IO ()
+telaInicial cursor = do
+
+   system "clear"
+   putStrLn("Bem vindo ao gerenciador de Vacina!")
+   putStrLn("Quais opções você deseja escolher?\n")
+   putStrLn("\n|| Ultilize os direcionais do teclado para mover o cursor ||\n")
+   showSimpleScreen opcoesTelaInicial cursor 0
+
+   hSetBuffering stdin NoBuffering 
+   hSetEcho stdin False
+   action <- getKey
+   doTelaInicial cursor action
+
+
+--------------------------------TELA DE LOGIN--------------------------------
+opcoesTelaLogin :: [String] 
+opcoesTelaLogin = ["Visualizar vacinas", "Visualizar dados"]
+
+mudarTelaLogin :: Integer -> IO()
+mudarTelaLogin cursor
+   | cursor == 0 = visualizaPacienteTela  --visualizaVacinaTela mudar
+   | cursor == 1 = visualizaPacienteTela
+   | cursor == 2 = cadastraVacinaAoPaciente
+
+
+doOpcoesLogin :: Integer -> [Char] -> IO ()
+doOpcoesLogin cursor action | action == "ESC[B" = telaOpcoesLogin((cursor+1) `mod` 5)
+                                                | action == "ESC[A" && cursor /= 0 = telaOpcoesLogin (cursor-1)
+                                                | action == "ESC[A" && cursor == 0 = telaOpcoesLogin 4
+                                                | otherwise = telaOpcoesLogin cursor
+
+
+telaOpcoesLogin :: Integer -> IO()
+telaOpcoesLogin cursor = do
+
+   system "clear"
+   putStrLn ("Bem vindo Paciente! \n\n || Aperte (Seta Direita) para escolher qual opção acessar e (Seta Esquerda) para voltar à tela anterior. ||\n")
+   showSimpleScreen opcoesTelaLogin cursor 0
+   hSetBuffering stdin NoBuffering 
+   hSetEcho stdin False 
+   action <- getKey
+   doOpcoesLogin cursor action
+
+
+--------------------------------VISUALIZA PACIENTE--------------------------------
+visualizaPacienteTela :: IO()
+visualizaPacienteTela = do
+   system "clear"
+   pacientes <- openFile "../Data/Paciente.txt" ReadMode 
+   listaPaciente <- lines <$> hGetContents pacientes
+   print listaPaciente
+
+   action <- getKey
+   putStrLn(" ")
+   telaInicial 0
 --------------------------------CADASTRA VACINA--------------------------------
 
 cadastraVacina :: IO ()
@@ -121,6 +199,26 @@ cadastraVacinaAoPaciente = do
 
 
 
+-------------------------------------METODOS AUXILIARES------------------------------
+
+getKey :: IO[Char]
+getKey = reverse <$> getKey' ""
+   where getKey' chars = do
+         char <- getChar 
+         more <- hReady stdin
+         (if more then getKey' else return) (char:chars)
+
+showSimpleScreen :: [String] -> Integer -> Integer -> IO()
+showSimpleScreen [] cursor contador = return ()
+showSimpleScreen (o:os) cursor contador = do
+   if contador == cursor
+      then
+         putStrLn ("->" ++ o)
+      else
+         putStrLn("  " ++ o)
+   showSimpleScreen os cursor (contador+1)
+
+
 lerEntradaString :: IO String
 lerEntradaString = do
          hSetBuffering stdin LineBuffering
@@ -142,13 +240,21 @@ lerEntradaDouble = do
          x <- readLn
          return x
 
+----------------------------------------------EXECUTAR--------------------------------------------------
+run :: IO ()
+run = do
+   {catch (iniciar) error;}
+   where
+      iniciar = do
+      {
+         telaInicial 0;
+         return ()
+      }
+      error = ioError 
 
-
-
-
-
-
-
+main :: IO ()
+main = do
+   run
 
 ---------------------------------------------------------------
 ---------------------------------------------------------------
