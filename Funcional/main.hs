@@ -20,7 +20,7 @@ main = do
     vacina <- lines <$> hGetContents dataVacina
     print vacina
 
-listaVacinasInicial :: [Int]
+listaVacinasInicial :: [Vacina]
 listaVacinasInicial = []
 
 listaDatasVacinasInicial :: [String]
@@ -54,6 +54,8 @@ cadastraVacina = do
    let listaVacina = [vacina]
    let adicionarVacina = listaVacina
    escreveArquivoVacina adicionarVacina
+   listaDeVacinas <- getVacinasEmLista 
+   print(getVacinaByID listaDeVacinas chaveVacina)
 
 --------------------------------CADASTRA PACIENTE-------------------------------------------
 
@@ -86,27 +88,36 @@ cadastraPaciente = do
 
 ------------------------------------CADASTRA VACINA AO PACIENTE-------------------------------
 
--- cadastraVacinaAoPaciente :: IO ()
--- cadastraVacinaAoPaciente = do
---    system "clear"
+cadastraVacinaAoPaciente :: IO ()
+cadastraVacinaAoPaciente = do
+   system "clear"
 
---    putStrLn ("ID")
---    idVacina <- lerEntradaString
+   putStrLn ("ID")
+   idVacina <- lerEntradaString
 
---    putStrLn ("\nCPF")
---    cpfPaciente <- lerEntradaString
+   putStrLn ("\nCPF")
+   cpfPaciente <- lerEntradaString
 
---    putStrLn ("\nData")
---    dataVacinacao <- lerEntradaString 
+   putStrLn ("\nData")
+   dataVacinacao <- lerEntradaString 
 
+
+   hSetBuffering stdin NoBuffering
+   hSetEcho stdin False
+
+   listPacientes <- getPacientesEmLista
+
+   listaDeVacinas <- getVacinasEmLista 
+
+   let testePacientes = listPacientes
    
---    hSetBuffering stdin NoBuffering
---    hSetEcho stdin False
-
---    let listPacientes = getPacientesEmLista 
-
---    adicionaVacina listPacientes cpfPaciente dataVacinacao idVacina
---    escreveArquivoPaciente adicionarPaciente
+   let vacina = getVacinaByID listaDeVacinas idVacina
+   
+   let resultado = adicionaVacina listPacientes cpfPaciente dataVacinacao vacina
+   
+   testePacientes <- getPacientesEmLista
+   print(testePacientes)
+   
 
 
 

@@ -38,18 +38,24 @@ converteEmListaVacina [] =[]
 converteEmListaVacina (atributo:lista) =
     converteEmVacina (split atributo ',') : converteEmListaVacina lista
 
+getVacinaByID :: [Vacina] -> String -> Vacina
+getVacinaByID [] idVacina = Vacina {key = "000", nome = "Inexistente", prazo = "00", doses = "00"}
+getVacinaByID (Vacina {key = k, nome = n, prazo = p, doses = d} : cs) idVacina
+  | k == idVacina = Vacina {key = k, nome = n, prazo = p, doses = d}
+  | otherwise = getVacinaByID cs idVacina
+
 
 converteEmVacina :: [String] -> Vacina
 converteEmVacina vacina = Vacina key nome prazo doses
     where
-        key = vacina !! 0
+        key = head vacina
         nome = vacina !! 1
         prazo = vacina !! 2
         doses = vacina !! 3
 
 lerVacina :: IO[String]
 lerVacina = do
-    arq <- openFile "../../Data/Vacina.txt" ReadMode 
+    arq <- openFile "../Data/Vacina.txt" ReadMode 
     conteudo <- lines <$> hGetContents arq
     return conteudo
 
