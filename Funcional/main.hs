@@ -30,20 +30,20 @@ listaDatasVacinasInicial = []
 
 --------------------------------TELA INICIAL----------------------------------
 opcoesTelaInicial :: [String]
-opcoesTelaInicial = ["Login", "Cadastro", "Sair"]
+opcoesTelaInicial = ["Entrar como Paciente", "Entrar como Admin", "Sair"]
 
 doTelaInicial :: Integer -> [Char] -> IO ()
 doTelaInicial cursor action | action == "\ESC[B" = telaInicial ((cursor+1) `mod` 4)
-                                                   | action == "ESC[A" && cursor /= 0 = telaInicial (cursor-1)
-                                                   | action == "ESC[A" && cursor == 0 = telaInicial 3
-                                                   | action == "ESC[C" = mudarTelaInicial cursor
-                                                   | action == "ESC[D" = putStrLn(" \n                   Até Mais!             \n")
+                                                   | action == "\ESC[A" && cursor /= 0 = telaInicial (cursor-1)
+                                                   | action == "\ESC[A" && cursor == 0 = telaInicial 3
+                                                   | action == "\ESC[C" = mudarTelaInicial cursor
+                                                   | action == "\ESC[D" = putStrLn(" \n                   Até Mais!             \n")
                                                    | otherwise = telaInicial cursor
                                                    
 
 mudarTelaInicial :: Integer -> IO()
 mudarTelaInicial cursor                          | cursor == 0 = do telaOpcoesLogin 0
-                                                 | cursor == 1 = do telaOpcoesLogin 0            
+                                                 | cursor == 1 = do telaOpcaoCadastro 0            
                                                  | cursor == 2 = do telaOpcoesLogin 0
 
 
@@ -62,10 +62,37 @@ telaInicial cursor = do
    action <- getKey
    doTelaInicial cursor action
 
+--------------------------------TELA DE CADASTRO--------------------------------
+opcoesTelaCadastro :: [String]
+opcoesTelaCadastro = ["Realizar Cadastro", "Editar Cadastro"]
+
+mudarTelaCadastro :: Integer -> IO ()
+mudarTelaCadastro cursor
+   | cursor == 0 = cadastraPaciente
+
+
+doOpcoesCadastro :: Integer -> [Char] -> IO ()
+doOpcoesCadastro cursor action | action == "\ESC[B" = telaOpcaoCadastro ((cursor+1) `mod` 4)
+                                                   | action == "\ESC[A" && cursor /= 0 = telaOpcaoCadastro (cursor-1)
+                                                   | action == "\ESC[A" && cursor == 0 = telaOpcaoCadastro 3
+                                                   | action == "\ESC[D" = telaInicial 0
+                                                
+                                    
+
+telaOpcaoCadastro :: Integer -> IO ()
+telaOpcaoCadastro cursor = do
+
+   system "clear"
+   putStrLn("Bem vindo Usuário! \n\n || Aperte (Seta Direita) para escolher qual opcão acessar e (Seta Esquerda) para voltar à tela anterior. ||\n")                                 
+   showSimpleScreen opcoesTelaCadastro cursor 0
+   hSetBuffering stdin NoBuffering 
+   hSetEcho stdin False
+   action <- getKey
+   doOpcoesCadastro cursor action 
 
 --------------------------------TELA DE LOGIN--------------------------------
 opcoesTelaLogin :: [String] 
-opcoesTelaLogin = ["Visualizar vacinas", "Visualizar dados"]
+opcoesTelaLogin = ["Visualizar Dados"]
 
 mudarTelaLogin :: Integer -> IO()
 mudarTelaLogin cursor
@@ -75,9 +102,10 @@ mudarTelaLogin cursor
 
 
 doOpcoesLogin :: Integer -> [Char] -> IO ()
-doOpcoesLogin cursor action | action == "ESC[B" = telaOpcoesLogin((cursor+1) `mod` 5)
-                                                | action == "ESC[A" && cursor /= 0 = telaOpcoesLogin (cursor-1)
-                                                | action == "ESC[A" && cursor == 0 = telaOpcoesLogin 4
+doOpcoesLogin cursor action | action == "\ESC[B" = telaOpcoesLogin((cursor+1) `mod` 5)
+                                                | action == "\ESC[A" && cursor /= 0 = telaOpcoesLogin (cursor-1)
+                                                | action == "\ESC[A" && cursor == 0 = telaOpcoesLogin 4
+                                                | action == "\ESC[D" = telaInicial 0
                                                 | otherwise = telaOpcoesLogin cursor
 
 
