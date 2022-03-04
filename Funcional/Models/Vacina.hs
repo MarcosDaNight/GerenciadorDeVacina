@@ -5,6 +5,7 @@ module Models.Vacina where
 import System.IO
 import System.IO.Unsafe
 import Control.Exception (evaluate)
+import Text.Read (Lexeme(String))
 
 -- id, vacina, doses, prazo
 
@@ -61,6 +62,9 @@ lerVacina = do
     evaluate(length conteudo)
     return conteudo
 
+-- Converte IO em puro
+fromIO :: IO[String] -> [String]
+fromIO x = (unsafePerformIO x :: [String])
 
 ------------------------------ UTIL ------------------------------
 formataParaEscritaVacina :: [Vacina] -> String 

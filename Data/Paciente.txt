@@ -1,3 +1,4 @@
 teste,5,5, , 
 teste,5,5,6,1
 teste,5,5,9,2
+teste,5,5,6,1
