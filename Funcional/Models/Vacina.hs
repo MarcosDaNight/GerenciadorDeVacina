@@ -48,7 +48,7 @@ getVacinaByID (Vacina {key = k, nome = n, prazo = p, doses = d} : cs) idVacina
 converteEmVacina :: [String] -> Vacina
 converteEmVacina vacina = Vacina key nome prazo doses
     where
-        key = head vacina
+        key = vacina !! 0
         nome = vacina !! 1
         prazo = vacina !! 2
         doses = vacina !! 3

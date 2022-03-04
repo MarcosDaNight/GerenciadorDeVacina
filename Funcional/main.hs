@@ -20,11 +20,11 @@ main = do
     vacina <- lines <$> hGetContents dataVacina
     print vacina
 
-listaVacinasInicial :: [Vacina]
-listaVacinasInicial = []
+listaVacinasInicial :: [String]
+listaVacinasInicial = [""]
 
 listaDatasVacinasInicial :: [String]
-listaDatasVacinasInicial = []
+listaDatasVacinasInicial = [""]
 
 --------------------------------CADASTRA VACINA--------------------------------
 
@@ -111,12 +111,14 @@ cadastraVacinaAoPaciente = do
 
    let testePacientes = listPacientes
    
-   let vacina = getVacinaByID listaDeVacinas idVacina
+   let resultado = adicionaVacina listPacientes cpfPaciente dataVacinacao idVacina
    
-   let resultado = adicionaVacina listPacientes cpfPaciente dataVacinacao vacina
+   escreveArquivoPaciente resultado
    
+
    testePacientes <- getPacientesEmLista
    print(testePacientes)
+   
    
 
 

@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use :" #-}
 module Models.Paciente where
 
 import System.IO
@@ -9,7 +11,7 @@ data Paciente = Paciente{
   cpf :: String,
   data_nascimento :: String,
   data_vacinacao :: [String],
-  vacinas :: [Vacina]
+  vacinas :: [String]
 } deriving (Show, Read)
 
 data Pacientes = Pacientes{
@@ -18,15 +20,13 @@ data Pacientes = Pacientes{
 
 ------------------------------ Getters ------------------------------
 getAtributosPaciente :: Paciente -> String
-getAtributosPaciente (Paciente {nomePaciente = nome, cpf = id, data_nascimento = nascimento, data_vacinacao = vacinacao, vacinas = doses}) = nome++","++id++","++nascimento++","++converteListaDatasEmString vacinacao++","++converteListaVacinasEmString doses
+getAtributosPaciente (Paciente {nomePaciente = nome, cpf = id, data_nascimento = nascimento, data_vacinacao = vacinacao, vacinas = doses}) = nome++","++id++","++nascimento++","++converteListaDatasEmString vacinacao++","++converteListaDatasEmString doses
 
-converteListaVacinasEmString :: [Vacina] -> String 
-converteListaVacinasEmString [] = ""
-converteListaEmVacinasString (c:cs) = formataParaEscritaVacina [c] ++ converteListaEmVacinasString cs
+
 
 converteListaDatasEmString :: [String] -> String 
 converteListaDatasEmString [] = ""
-converteListaDatasEmString (c:cs) = (c :: String) ++ converteListaDatasEmString cs
+converteListaDatasEmString (c:cs) = c ++ "," ++ converteListaDatasEmString cs
 
 getPacientes :: Pacientes -> [Paciente]
 getPacientes (Pacientes {pacientes = p}) = getPacientesData p
@@ -44,7 +44,7 @@ mapeiaCpf [] = []
 mapeiaCpf (c:cs) = (getCpf c, c) : mapeiaCpf cs
 
 ------------------------------ AdicionaVacinaAoPaciente ------------------------------
-adicionaVacina :: [Paciente] -> String -> String -> Vacina -> [Paciente]
+adicionaVacina :: [Paciente] -> String -> String -> String -> [Paciente]
 adicionaVacina [] cpfPaciente dataVacinacao vacinaAplicada = []
 adicionaVacina (Paciente {nomePaciente = n, cpf = c, data_nascimento = d, data_vacinacao = dv, vacinas = v}:cs) cpfPaciente dataVacinacao vacinaAplicada
   | c == cpfPaciente = [Paciente n c d (dv++[dataVacinacao]) (v++[vacinaAplicada])] ++ cs
@@ -53,8 +53,15 @@ adicionaVacina (Paciente {nomePaciente = n, cpf = c, data_nascimento = d, data_v
 ------------------------------ IOPaciente------------------------------
 escreveArquivoPaciente:: [Paciente] -> IO ()
 escreveArquivoPaciente pacientes = do
-    arq <- openFile "../Data/Paciente.txt" AppendMode 
+    arq <- openFile "../Data/Paciente.txt" WriteMode  
     hPutStr arq(formataParaEscritaPacientes pacientes)
+    hClose arq
+
+
+escreveArquivoPacienteUnico:: Paciente -> IO ()
+escreveArquivoPacienteUnico paciente = do
+    arq <- openFile "../Data/Paciente.txt" WriteMode  
+    hPutStr arq(formataParaEscritaPaciente paciente)
     hClose arq
 
 -- Leitura
@@ -78,7 +85,7 @@ converteEmPaciente paciente = Paciente nomePaciente cpf data_nascimento data_vac
         cpf = paciente !! 1
         data_nascimento = paciente !! 2
         data_vacinacao = []
-        vacina = [converteEmVacina [paciente !! 4]]
+        vacina = [paciente !! 4]
 
 lerPaciente :: IO[String]
 lerPaciente = do
@@ -93,6 +100,9 @@ lerPaciente = do
 formataParaEscritaPacientes :: [Paciente] -> String
 formataParaEscritaPacientes [] = []
 formataParaEscritaPacientes (c:cs) = getAtributosPaciente c ++ "\n" ++ formataParaEscritaPacientes cs
+
+formataParaEscritaPaciente :: Paciente -> String
+formataParaEscritaPaciente Paciente {nomePaciente = n, cpf = c, data_nascimento = d, data_vacinacao = dv, vacinas = v} = n++","++c++","++d++","++converteListaDatasEmString dv++","++converteListaDatasEmString v
 
 pacienteToString :: [String] -> String
 pacienteToString lista = "Nome:" ++ (lista !! 0) ++ " | cpf:" ++ (lista !! 1) ++ " | data de cadastro:" ++ (lista !! 2)
