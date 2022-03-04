@@ -16,11 +16,6 @@ import System.IO
 import Text.XHtml (action)
 import System.Console.Terminfo (cursorAddress)
 
---main:: IO()
---main = do
-  --  dataVacina <- openFile "../Data/Vacina.txt" ReadMode
-    --vacina <- lines <$> hGetContents dataVacina
-    --print vacina
 
 listaVacinasInicial :: String
 listaVacinasInicial = " "
@@ -79,6 +74,7 @@ doOpcoesCadastro :: Integer -> [Char] -> IO ()
 doOpcoesCadastro cursor action | action == "\ESC[B" = telaOpcaoCadastro ((cursor+1) `mod` 3)
                                                    | action == "\ESC[A" && cursor /= 0 = telaOpcaoCadastro (cursor-1)
                                                    | action == "\ESC[A" && cursor == 0 = telaOpcaoCadastro 3
+                                                   | action == "\ESC[C" = mudarTelaCadastro cursor
                                                    | action == "\ESC[D" = telaInicial 0
                                                    | otherwise = telaOpcaoCadastro cursor
                                                 
@@ -101,16 +97,13 @@ opcoesTelaLogin = ["Visualizar Dados"]
 
 mudarTelaLogin :: Integer -> IO()
 mudarTelaLogin cursor
-   | cursor == 0 = visualizaPacienteTela  --visualizaVacinaTela mudar
-   | cursor == 1 = visualizaPacienteTela
-   | cursor == 2 = cadastraVacinaAoPaciente
+   | cursor == 0 = visualizaPacienteTela  
    | otherwise = telaInicial 0 
 
 
 doOpcoesLogin :: Integer -> [Char] -> IO ()
-doOpcoesLogin cursor action | action == "\ESC[B" = telaOpcoesLogin((cursor+1) `mod` 5)
+doOpcoesLogin cursor action | action == "\ESC[B" = telaOpcoesLogin((cursor+1) `mod` 1)
                                                 | action == "\ESC[A" && cursor /= 0 = telaOpcoesLogin (cursor-1)
-                                                | action == "\ESC[A" && cursor == 0 = telaOpcoesLogin 4
                                                 | action == "\ESC[D" = telaInicial 0
                                                 | otherwise = telaOpcoesLogin cursor
 
@@ -136,7 +129,6 @@ visualizaPacienteTela = do
    print listaPaciente
 
    action <- getKey
-   putStrLn(" ")
    telaInicial 0
 --------------------------------CADASTRA VACINA--------------------------------
 
@@ -195,8 +187,8 @@ cadastraPaciente = do
    let adicionarPaciente = listaPaciente
    escreveArquivoPaciente adicionarPaciente
    
-   --action <- getKey
-   --telaInicial 0
+   action <- getKey
+   telaInicial 0
 
 ------------------------------------CADASTRA VACINA AO PACIENTE-------------------------------
 
