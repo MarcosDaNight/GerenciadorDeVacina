@@ -39,7 +39,7 @@ doTelaInicial cursor action | action == "\ESC[B" = telaInicial ((cursor+1) `mod`
 mudarTelaInicial :: Integer -> IO()
 mudarTelaInicial cursor                          | cursor == 0 = do telaOpcoesLogin 0
                                                  | cursor == 1 = do telaOpcaoCadastro 0            
-                                                 | cursor == 2 = do telaOpcoesLogin 0
+                                                 | cursor == 2 = do telaSair
                                                  | otherwise = telaInicial 0
 
 
@@ -104,6 +104,7 @@ mudarTelaLogin cursor
 doOpcoesLogin :: Integer -> [Char] -> IO ()
 doOpcoesLogin cursor action | action == "\ESC[B" = telaOpcoesLogin((cursor+1) `mod` 1)
                                                 | action == "\ESC[A" && cursor /= 0 = telaOpcoesLogin (cursor-1)
+                                                | action == "\ESC[C"= mudarTelaLogin cursor
                                                 | action == "\ESC[D" = telaInicial 0
                                                 | otherwise = telaOpcoesLogin cursor
 
@@ -268,7 +269,20 @@ lerEntradaDouble = do
          x <- readLn
          return x
 
+----------------------------------------------SAIR--------------------------------------------------
+doTelaSair :: String -> IO ()
+doTelaSair action    | action == "s" = return() 
+                     | otherwise = telaInicial 0
 
+telaSair :: IO ()
+telaSair = do
+   system "clear"
+   putStrLn("Digite (s) para encerrar a execução ou (Outra tecla) para voltar para o menu");
+   
+   hSetBuffering stdin NoBuffering
+   hSetEcho stdin False
+   action <- getKey
+   doTelaSair action
 ----------------------------------------------EXECUTAR--------------------------------------------------
 run :: IO ()
 run = do
