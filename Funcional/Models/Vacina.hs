@@ -4,6 +4,7 @@ module Models.Vacina where
 
 import System.IO
 import System.IO.Unsafe
+import Control.Exception (evaluate)
 
 -- id, vacina, doses, prazo
 
@@ -57,6 +58,7 @@ lerVacina :: IO[String]
 lerVacina = do
     arq <- openFile "../Data/Vacina.txt" ReadMode 
     conteudo <- lines <$> hGetContents arq
+    evaluate(length conteudo)
     return conteudo
 
 

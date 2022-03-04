@@ -20,11 +20,11 @@ main = do
     vacina <- lines <$> hGetContents dataVacina
     print vacina
 
-listaVacinasInicial :: [String]
-listaVacinasInicial = [""]
+listaVacinasInicial :: String
+listaVacinasInicial = " "
 
-listaDatasVacinasInicial :: [String]
-listaDatasVacinasInicial = [""]
+listaDatasVacinasInicial :: String
+listaDatasVacinasInicial = " "
 
 --------------------------------CADASTRA VACINA--------------------------------
 
@@ -114,7 +114,6 @@ cadastraVacinaAoPaciente = do
    let resultado = adicionaVacina listPacientes cpfPaciente dataVacinacao idVacina
    
    escreveArquivoPaciente resultado
-   
 
    testePacientes <- getPacientesEmLista
    print(testePacientes)
@@ -143,12 +142,6 @@ lerEntradaDouble = do
          hSetEcho stdin True
          x <- readLn
          return x
-
-
-
-
-
-
 
 
 
