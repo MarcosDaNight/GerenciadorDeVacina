@@ -1,7 +1,7 @@
-import System.IO 
+import System.IO
 import System.IO.Unsafe
 import Control.Exception
-import System.IO.Error 
+import System.IO.Error
 import System.Process
 import Control.Monad (when)
 import Text.Printf
@@ -13,8 +13,9 @@ import Models.Paciente
 
 import System.Directory
 import System.IO
-import Text.XHtml (action)
+import Text.XHtml (action, li)
 import System.Console.Terminfo (cursorAddress)
+import Data.Char (digitToInt)
 
 
 listaVacinasInicial :: String
@@ -34,11 +35,11 @@ doTelaInicial cursor action | action == "\ESC[B" = telaInicial ((cursor+1) `mod`
                                                    | action == "\ESC[C" = mudarTelaInicial cursor
                                                    | action == "\ESC[D" = putStrLn(" \n                   Até Mais!             \n")
                                                    | otherwise = telaInicial cursor
-                                                   
+
 
 mudarTelaInicial :: Integer -> IO()
 mudarTelaInicial cursor                          | cursor == 0 = do telaOpcoesLogin 0
-                                                 | cursor == 1 = do telaOpcaoCadastro 0            
+                                                 | cursor == 1 = do telaOpcaoCadastro 0
                                                  | cursor == 2 = do telaSair
                                                  | otherwise = telaInicial 0
 
@@ -53,7 +54,7 @@ telaInicial cursor = do
    putStrLn("\n|| Ultilize os direcionais do teclado para mover o cursor ||\n")
    showSimpleScreen opcoesTelaInicial cursor 0
 
-   hSetBuffering stdin NoBuffering 
+   hSetBuffering stdin NoBuffering
    hSetEcho stdin False
    action <- getKey
    doTelaInicial cursor action
@@ -77,28 +78,28 @@ doOpcoesCadastro cursor action | action == "\ESC[B" = telaOpcaoCadastro ((cursor
                                                    | action == "\ESC[C" = mudarTelaCadastro cursor
                                                    | action == "\ESC[D" = telaInicial 0
                                                    | otherwise = telaOpcaoCadastro cursor
-                                                
-                                    
+
+
 
 telaOpcaoCadastro :: Integer -> IO ()
 telaOpcaoCadastro cursor = do
 
    system "clear"
-   putStrLn("Bem vindo Usuário! \n\n || Aperte (Seta Direita) para escolher qual opcão acessar e (Seta Esquerda) para voltar à tela anterior. ||\n")                                 
+   putStrLn("Bem vindo Usuário! \n\n || Aperte (Seta Direita) para escolher qual opcão acessar e (Seta Esquerda) para voltar à tela anterior. ||\n")
    showSimpleScreen opcoesTelaCadastro cursor 0
-   hSetBuffering stdin NoBuffering 
+   hSetBuffering stdin NoBuffering
    hSetEcho stdin False
    action <- getKey
-   doOpcoesCadastro cursor action 
+   doOpcoesCadastro cursor action
 
 --------------------------------TELA DE LOGIN--------------------------------
-opcoesTelaLogin :: [String] 
+opcoesTelaLogin :: [String]
 opcoesTelaLogin = ["Visualizar Dados"]
 
 mudarTelaLogin :: Integer -> IO()
 mudarTelaLogin cursor
-   | cursor == 0 = visualizaPacienteTela  
-   | otherwise = telaInicial 0 
+   | cursor == 0 = visualizaPacienteTela
+   | otherwise = telaInicial 0
 
 
 doOpcoesLogin :: Integer -> [Char] -> IO ()
@@ -115,8 +116,8 @@ telaOpcoesLogin cursor = do
    system "clear"
    putStrLn ("Bem vindo Paciente! \n\n || Aperte (Seta Direita) para escolher qual opção acessar e (Seta Esquerda) para voltar à tela anterior. ||\n")
    showSimpleScreen opcoesTelaLogin cursor 0
-   hSetBuffering stdin NoBuffering 
-   hSetEcho stdin False 
+   hSetBuffering stdin NoBuffering
+   hSetEcho stdin False
    action <- getKey
    doOpcoesLogin cursor action
 
@@ -125,14 +126,52 @@ telaOpcoesLogin cursor = do
 visualizaPacienteTela :: IO()
 visualizaPacienteTela = do
    system "clear"
-   pacientes <- openFile "../Data/Paciente.txt" ReadMode 
+   pacientes <- openFile "../Data/Paciente.txt" ReadMode
    listaPaciente <- lines <$> hGetContents pacientes
-   print listaPaciente
 
    action <- getKey
    telaInicial 0
---------------------------------CADASTRA VACINA--------------------------------
 
+
+
+--Unica solução que encontrei aqui por enquanto ofr receber char e string já que as funções que uso tem entradas diferentes
+checaSePodeCadastrar:: Char -> String -> String -> IO()
+checaSePodeCadastrar idVacina idVacinaTbm cpf = do
+   system "clear"
+   pacientes <- openFile "../Data/Paciente.txt" ReadMode
+   listaPaciente <- lines <$> hGetContents pacientes
+   let listaCpfsIguais = removeItem cpf listaPaciente
+   let listaIds = pegaIdVacinaPaciente listaCpfsIguais
+   let removeIdsDiferentes = removeLetra idVacina listaIds
+   let pegaDosesMaximas = getVacinaDoses idVacinaTbm
+   let numero = length removeIdsDiferentes
+   let dosesMaximas = read pegaDosesMaximas :: Int
+   print( numero < dosesMaximas)
+
+
+
+quebraString:: [Char] -> [String]
+quebraString palavra = split palavra ','
+
+pegaIdVacinaPaciente:: [String] -> String
+pegaIdVacinaPaciente [] = ""
+pegaIdVacinaPaciente (x:xs) = last(quebraString(x)) ++ pegaIdVacinaPaciente xs
+
+
+isolaCpf:: [Char] -> String
+isolaCpf paciente = head(split paciente ',' )
+
+removeLetra:: Char -> [Char] -> String
+removeLetra _ []                 = []
+removeLetra x (y:ys) | x /= y || y == ' ' = removeLetra x ys
+                     | otherwise = y : removeLetra x ys
+
+removeItem :: String -> [String] -> [String]
+removeItem _ []                 = []
+removeItem x (y:ys) | x /= isolaCpf y    = removeItem x ys
+                    | otherwise = y : removeItem x ys
+
+--------------------------------CADASTRA VACINA--------------------------------
 cadastraVacina :: IO ()
 cadastraVacina = do
    system "clear"
@@ -141,16 +180,16 @@ cadastraVacina = do
    chaveVacina <- lerEntradaString
 
    putStrLn ("\nDigite o nome da vacina")
-   nomeVacina <- lerEntradaString 
+   nomeVacina <- lerEntradaString
 
    putStrLn ("\nDigite o prazo da vacina: (Apenas números)")
-   prazoVacina <- lerEntradaString  
+   prazoVacina <- lerEntradaString
 
    putStrLn ("\nDigite a quantidade de doses da vacina: (Apenas números)")
-   dosesVacina <- lerEntradaString  
+   dosesVacina <- lerEntradaString
 
    putStrLn("\nA vacina foi cadastrada com sucesso!\n")
-   
+
    hSetBuffering stdin NoBuffering
    hSetEcho stdin False
 
@@ -159,7 +198,7 @@ cadastraVacina = do
    let listaVacina = [vacina]
    let adicionarVacina = listaVacina
    escreveArquivoVacina adicionarVacina
-   listaDeVacinas <- getVacinasEmLista 
+   listaDeVacinas <- getVacinasEmLista
    print(getVacinaByID listaDeVacinas chaveVacina)
 
 --------------------------------CADASTRA PACIENTE-------------------------------------------
@@ -172,13 +211,13 @@ cadastraPaciente = do
    nomePaciente <- lerEntradaString
 
    putStrLn ("\nDigite o cpf do paciente: (Apenas números)")
-   cpfPaciente <- lerEntradaString 
+   cpfPaciente <- lerEntradaString
 
    putStrLn ("\nDigite a data de nascimento do paciente: (Apenas números)")
-   dataNascimento <- lerEntradaString  
+   dataNascimento <- lerEntradaString
 
    putStrLn("\nO paciente foi cadastrado com sucesso!\n")
-   
+
    hSetBuffering stdin NoBuffering
    hSetEcho stdin False
 
@@ -187,7 +226,7 @@ cadastraPaciente = do
    let listaPaciente = [paciente]
    let adicionarPaciente = listaPaciente
    escreveArquivoPaciente adicionarPaciente
-   
+
    action <- getKey
    telaInicial 0
 
@@ -204,7 +243,7 @@ cadastraVacinaAoPaciente = do
    cpfPaciente <- lerEntradaString
 
    putStrLn ("\nDigite a data da dose:")
-   dataVacinacao <- lerEntradaString 
+   dataVacinacao <- lerEntradaString
 
 
    hSetBuffering stdin NoBuffering
@@ -212,18 +251,18 @@ cadastraVacinaAoPaciente = do
 
    listPacientes <- getPacientesEmLista
 
-   listaDeVacinas <- getVacinasEmLista 
+   listaDeVacinas <- getVacinasEmLista
 
    let testePacientes = listPacientes
-   
+
    let resultado = adicionaVacina listPacientes cpfPaciente dataVacinacao idVacina
-   
+
    escreveArquivoPaciente resultado
 
    print(resultado)
    action <- getKey
    telaInicial 0
-   
+
 
 
 
@@ -232,7 +271,7 @@ cadastraVacinaAoPaciente = do
 getKey :: IO[Char]
 getKey = reverse <$> getKey' ""
    where getKey' chars = do
-         char <- getChar 
+         char <- getChar
          more <- hReady stdin
          (if more then getKey' else return) (char:chars)
 
@@ -270,14 +309,14 @@ lerEntradaDouble = do
 
 ----------------------------------------------SAIR--------------------------------------------------
 doTelaSair :: String -> IO ()
-doTelaSair action    | action == "s" = return() 
+doTelaSair action    | action == "s" = return()
                      | otherwise = telaInicial 0
 
 telaSair :: IO ()
 telaSair = do
    system "clear"
    putStrLn("Digite (s) para encerrar a execução ou (Outra tecla) para voltar para o menu");
-   
+
    hSetBuffering stdin NoBuffering
    hSetEcho stdin False
    action <- getKey
@@ -292,7 +331,7 @@ run = do
          telaInicial 0;
          return ()
       }
-      error = ioError 
+      error = ioError
 
 main :: IO ()
 main = do
@@ -300,4 +339,6 @@ main = do
 
 ---------------------------------------------------------------
 ---------------------------------------------------------------
+
+
 

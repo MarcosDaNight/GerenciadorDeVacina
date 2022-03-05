@@ -6,6 +6,8 @@ import System.IO
 import System.IO.Unsafe
 import Control.Exception (evaluate)
 import Text.Read (Lexeme(String))
+import Data.Char (digitToInt)
+
 
 -- id, vacina, doses, prazo
 
@@ -20,6 +22,12 @@ data Vacina = Vacina{
 getAtributosVacina :: Vacina -> String 
 getAtributosVacina (Vacina {key = k, nome = n, prazo = p, doses = d}) = k++","++n++","++p++","++d
 
+getVacinaDoses :: String -> String
+getVacinaDoses idVacina = do
+    let listaVacinas = getVacinasEmLista
+    let Vacina {key = k, nome = n, prazo = p, doses = d} = getVacinaByID (unsafePerformIO getVacinasEmLista) idVacina 
+    let letra = head d
+    return letra
 
 ------------------------------ IOVacina ------------------------------
 escreveArquivoVacina :: [Vacina] -> IO ()
@@ -27,6 +35,7 @@ escreveArquivoVacina vacinas = do
     arq <- openFile "../Data/Vacina.txt" AppendMode 
     hPutStr arq(formataParaEscritaVacina vacinas)
     hClose arq
+
 
 ------------------------------ Vizualização ------------------------------
 getVacinasEmLista :: IO [Vacina]

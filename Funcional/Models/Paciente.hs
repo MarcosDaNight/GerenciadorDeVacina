@@ -21,7 +21,7 @@ data Pacientes = Pacientes{
 
 ------------------------------ Getters ------------------------------
 getAtributosPaciente :: Paciente -> String
-getAtributosPaciente (Paciente {nomePaciente = nome, cpf = id, data_nascimento = nascimento, data_vacinacao = vacinacao, vacinas = dose}) = nome++","++id++","++nascimento++","++ vacinacao++","++ dose
+getAtributosPaciente (Paciente {nomePaciente = nome, cpf = id, data_nascimento = nascimento, data_vacinacao = vacinacao, vacinas = dose}) = id++","++nome++","++nascimento++","++ vacinacao++","++ dose
 
 getPacientes :: Pacientes -> [Paciente]
 getPacientes (Pacientes {pacientes = p}) = getPacientesData p
@@ -56,14 +56,9 @@ escreveArquivoPaciente pacientes = do
     hClose arq
 
 
-escreveArquivoPacienteUnico:: Paciente -> IO ()
-escreveArquivoPacienteUnico paciente = do
-    arq <- openFile "../Data/Paciente.txt" AppendMode   
-    hPutStr arq(formataParaEscritaPaciente paciente)
-    hFlush arq
-    hClose arq
 
 -- Leitura
+
 getPacientesEmLista :: IO [Paciente]
 getPacientesEmLista = do
     listaPacienteStr <- lerPaciente
@@ -102,4 +97,7 @@ formataParaEscritaPaciente Paciente {nomePaciente = n, cpf = c, data_nascimento 
 
 pacienteToString :: [String] -> String
 pacienteToString lista = "Nome:" ++ (lista !! 0) ++ " | cpf:" ++ (lista !! 1) ++ " | data de cadastro:" ++ (lista !! 2)
+
+
+
 
