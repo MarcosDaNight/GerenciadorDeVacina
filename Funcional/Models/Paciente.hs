@@ -45,6 +45,8 @@ adicionaVacina (Paciente {nomePaciente = n, cpf = c, data_nascimento = d, data_v
   | c == cpfPaciente = [Paciente n c d dataVacinacao vacinaAplicada]
   | otherwise = adicionaVacina cs cpfPaciente dataVacinacao vacinaAplicada
 
+
+
 ------------------------------ IOPaciente------------------------------
 escreveArquivoPaciente:: [Paciente] -> IO ()
 escreveArquivoPaciente pacientes = do

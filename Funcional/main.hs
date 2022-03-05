@@ -197,13 +197,13 @@ cadastraVacinaAoPaciente :: IO ()
 cadastraVacinaAoPaciente = do
    system "clear"
 
-   putStrLn ("ID")
+   putStrLn ("Digite o ID da Vacina:")
    idVacina <- lerEntradaString
 
-   putStrLn ("\nCPF")
+   putStrLn ("\nDigite o CPF do paciente:")
    cpfPaciente <- lerEntradaString
 
-   putStrLn ("\nData")
+   putStrLn ("\nDigite a data da dose:")
    dataVacinacao <- lerEntradaString 
 
 
@@ -220,8 +220,7 @@ cadastraVacinaAoPaciente = do
    
    escreveArquivoPaciente resultado
 
-   --testePacientes <- getPacientesEmLista
-   --print(testePacientes)
+   print(resultado)
    action <- getKey
    telaInicial 0
    
