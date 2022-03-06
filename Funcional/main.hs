@@ -198,7 +198,9 @@ cadastraVacina = do
    let adicionarVacina = listaVacina
    escreveArquivoVacina adicionarVacina
    listaDeVacinas <- getVacinasEmLista
-   print(getVacinaByID listaDeVacinas chaveVacina)
+   
+   action <- getKey
+   telaInicial 0
 
 --------------------------------CADASTRA PACIENTE-------------------------------------------
 
@@ -220,7 +222,7 @@ cadastraPaciente = do
    hSetBuffering stdin NoBuffering
    hSetEcho stdin False
 
-   let paciente = Paciente nomePaciente cpfPaciente dataNascimento listaDatasVacinasInicial listaVacinasInicial
+   let paciente = Paciente cpfPaciente nomePaciente dataNascimento listaDatasVacinasInicial listaVacinasInicial
 
    let listaPaciente = [paciente]
    let adicionarPaciente = listaPaciente
