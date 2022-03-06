@@ -42,7 +42,7 @@ mapeiaCpf (c:cs) = (getCpf c, c) : mapeiaCpf cs
 adicionaVacina :: [Paciente] -> String -> String -> String -> [Paciente]
 adicionaVacina [] cpfPaciente dataVacinacao vacinaAplicada = []
 adicionaVacina (Paciente { cpf = c, nomePaciente = n, data_nascimento = d, data_vacinacao = dv, vacinas = v}:cs) cpfPaciente dataVacinacao vacinaAplicada
-  | c == cpfPaciente = [Paciente n c d dataVacinacao vacinaAplicada]
+  | c == cpfPaciente = [Paciente c n d dataVacinacao vacinaAplicada]
   | otherwise = adicionaVacina cs cpfPaciente dataVacinacao vacinaAplicada
 
 
@@ -93,11 +93,29 @@ formataParaEscritaPacientes [] = []
 formataParaEscritaPacientes (c:cs) = getAtributosPaciente c ++ "\n" ++ formataParaEscritaPacientes cs
 
 formataParaEscritaPaciente :: Paciente -> String
-formataParaEscritaPaciente Paciente {cpf = c, nomePaciente = n, data_nascimento = d, data_vacinacao = dv, vacinas = v} = n++","++c++","++d++","++dv++","++v
+formataParaEscritaPaciente Paciente {cpf = c, nomePaciente = n, data_nascimento = d, data_vacinacao = dv, vacinas = v} = c++","++n++","++d++","++dv++","++v
 
 pacienteToString :: [String] -> String
 pacienteToString lista = "Nome:" ++ (lista !! 1) ++ " | cpf:" ++ (lista !! 0) ++ " | data de cadastro:" ++ (lista !! 2)
 
+quebraString:: [Char] -> [String]
+quebraString palavra = split palavra ','
+
+pegaIdVacinaPaciente:: [String] -> String
+pegaIdVacinaPaciente [] = ""
+pegaIdVacinaPaciente (x:xs) = last(quebraString(x)) ++ pegaIdVacinaPaciente xs
 
 
+isolaCpf:: [Char] -> String
+isolaCpf paciente = head(split paciente ',' )
+
+removeLetra:: Char -> [Char] -> String
+removeLetra _ []                 = []
+removeLetra x (y:ys) | x /= y || y == ' ' = removeLetra x ys
+                     | otherwise = y : removeLetra x ys
+
+removeItem :: String -> [String] -> [String]
+removeItem _ []                 = []
+removeItem x (y:ys) | x /= isolaCpf y    = removeItem x ys
+                    | otherwise = y : removeItem x ys
 

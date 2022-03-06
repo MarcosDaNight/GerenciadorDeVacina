@@ -131,57 +131,18 @@ visualizaPacienteTela = do
 
    action <- getKey
    telaInicial 0
-
-
-
---Unica solução que encontrei aqui por enquanto ofr receber char e string já que as funções que uso tem entradas diferentes
-checaSePodeCadastrar:: Char -> String -> String -> IO Bool
-checaSePodeCadastrar idVacina idVacinaTbm cpf = do
-   system "clear"
-   pacientes <- openFile "../Data/Paciente.txt" ReadMode
-   listaPaciente <- lines <$> hGetContents pacientes
-   let listaCpfsIguais = removeItem cpf listaPaciente
-   let listaIds = pegaIdVacinaPaciente listaCpfsIguais
-   let removeIdsDiferentes = removeLetra idVacina listaIds
-   let pegaDosesMaximas = getVacinaDoses idVacinaTbm
-   let numero = length removeIdsDiferentes
-   let dosesMaximas = read pegaDosesMaximas :: Int
-   let result = numero < dosesMaximas
-   return result
-
-quebraString:: [Char] -> [String]
-quebraString palavra = split palavra ','
-
-pegaIdVacinaPaciente:: [String] -> String
-pegaIdVacinaPaciente [] = ""
-pegaIdVacinaPaciente (x:xs) = last(quebraString(x)) ++ pegaIdVacinaPaciente xs
-
-
-isolaCpf:: [Char] -> String
-isolaCpf paciente = head(split paciente ',' )
-
-removeLetra:: Char -> [Char] -> String
-removeLetra _ []                 = []
-removeLetra x (y:ys) | x /= y || y == ' ' = removeLetra x ys
-                     | otherwise = y : removeLetra x ys
-
-removeItem :: String -> [String] -> [String]
-removeItem _ []                 = []
-removeItem x (y:ys) | x /= isolaCpf y    = removeItem x ys
-                    | otherwise = y : removeItem x ys
-
 --------------------------------CADASTRA VACINA--------------------------------
 cadastraVacina :: IO ()
 cadastraVacina = do
    system "clear"
 
-   putStrLn ("Digite o ID da vacina: (Sem caracteres especiais)")
+   putStrLn ("Digite o ID da vacina: (Sem caracteres especiais, entre 0-9)")
    chaveVacina <- lerEntradaString
 
-   putStrLn ("\nDigite o nome da vacina")
+   putStrLn ("\nDigite o nome da vacina:")
    nomeVacina <- lerEntradaString
 
-   putStrLn ("\nDigite o prazo da vacina: (Apenas números)")
+   putStrLn ("\nDigite o prazo da vacina em meses: (Apenas números)")
    prazoVacina <- lerEntradaString
 
    putStrLn ("\nDigite a quantidade de doses da vacina: (Apenas números)")
@@ -256,16 +217,26 @@ cadastraVacinaAoPaciente = do
 
    let testePacientes = listPacientes
 
-   let resultado = adicionaVacina listPacientes cpfPaciente dataVacinacao idVacina
+   pacientes <- openFile "../Data/Paciente.txt" ReadMode
+   listaPaciente <- lines <$> hGetContents pacientes
+   let listaCpfsIguais = removeItem cpfPaciente listaPaciente
+   let listaIds = pegaIdVacinaPaciente listaCpfsIguais
+   let removeIdsDiferentes = removeLetra (head idVacina) listaIds
+   let pegaDosesMaximas = getVacinaDoses (head idVacina)
+   let numero = length removeIdsDiferentes
+   let dosesMaximas = read pegaDosesMaximas :: Int
+   let result = numero < dosesMaximas
 
-   escreveArquivoPaciente resultado
-
-   print(resultado)
-   action <- getKey
-   telaInicial 0
-
-
-
+   if result then do 
+      let resultado = adicionaVacina listPacientes cpfPaciente dataVacinacao idVacina
+      escreveArquivoPaciente resultado
+      print("Vacina adicionada com sucesso!")
+      action <- getKey
+      telaInicial 0
+   else do
+      print("Paciente ja tomou todas as doses necessarias dessa vacina!")
+      action <- getKey
+      telaInicial 0
 
 -------------------------------------METODOS AUXILIARES------------------------------
 
@@ -337,9 +308,3 @@ run = do
 main :: IO ()
 main = do
    run
-
----------------------------------------------------------------
----------------------------------------------------------------
-
-
-

@@ -22,10 +22,10 @@ data Vacina = Vacina{
 getAtributosVacina :: Vacina -> String 
 getAtributosVacina (Vacina {key = k, nome = n, prazo = p, doses = d}) = k++","++n++","++p++","++d
 
-getVacinaDoses :: String -> String
+getVacinaDoses :: Char -> String
 getVacinaDoses idVacina = do
     let listaVacinas = getVacinasEmLista
-    let Vacina {key = k, nome = n, prazo = p, doses = d} = getVacinaByID (unsafePerformIO getVacinasEmLista) idVacina 
+    let Vacina {key = k, nome = n, prazo = p, doses = d} = getVacinaByID (unsafePerformIO getVacinasEmLista) [idVacina] 
     let letra = head d
     return letra
 
