@@ -1,16 +1,9 @@
 module Models.Vacina where
-
---import Paciente(getPacientePeloId, getPacienteId, fromIO)
-
 import System.IO
 import System.IO.Unsafe
 import Control.Exception (evaluate)
 import Text.Read (Lexeme(String))
 import Data.Char (digitToInt)
-
-
--- id, vacina, doses, prazo
-
 data Vacina = Vacina{
     key :: String,
     nome :: String,
@@ -19,6 +12,7 @@ data Vacina = Vacina{
 }  deriving (Show, Read)
 
 ------------------------------ Getters ------------------------------
+
 getAtributosVacina :: Vacina -> String 
 getAtributosVacina (Vacina {key = k, nome = n, prazo = p, doses = d}) = k++","++n++","++p++","++d
 
@@ -29,25 +23,11 @@ getVacinaDoses idVacina = do
     let letra = head d
     return letra
 
------------------------------- IOVacina ------------------------------
-escreveArquivoVacina :: [Vacina] -> IO ()
-escreveArquivoVacina vacinas = do
-    arq <- openFile "../Data/Vacina.txt" AppendMode 
-    hPutStr arq(formataParaEscritaVacina vacinas)
-    hClose arq
-
-
------------------------------- Vizualização ------------------------------
 getVacinasEmLista :: IO [Vacina]
 getVacinasEmLista = do
     listaVacinaStr <- lerVacina
     let vacinas = (converteEmListaVacina listaVacinaStr)
     return vacinas
-
-converteEmListaVacina :: [String] -> [Vacina]
-converteEmListaVacina [] =[]
-converteEmListaVacina (atributo:lista) =
-    converteEmVacina (split atributo ',') : converteEmListaVacina lista
 
 getVacinaByID :: [Vacina] -> String -> Vacina
 getVacinaByID [] idVacina = Vacina {key = "000", nome = "Inexistente", prazo = "00", doses = "00"}
@@ -55,6 +35,20 @@ getVacinaByID (Vacina {key = k, nome = n, prazo = p, doses = d} : cs) idVacina
   | k == idVacina = Vacina {key = k, nome = n, prazo = p, doses = d}
   | otherwise = getVacinaByID cs idVacina
 
+------------------------------ IOVacina -----------------------------
+
+escreveArquivoVacina :: [Vacina] -> IO ()
+escreveArquivoVacina vacinas = do
+    arq <- openFile "../Data/Vacina.txt" AppendMode 
+    hPutStr arq(formataParaEscritaVacina vacinas)
+    hClose arq
+
+------------------------------ Vizualização --------------------------
+
+converteEmListaVacina :: [String] -> [Vacina]
+converteEmListaVacina [] =[]
+converteEmListaVacina (atributo:lista) =
+    converteEmVacina (split atributo ',') : converteEmListaVacina lista
 
 converteEmVacina :: [String] -> Vacina
 converteEmVacina vacina = Vacina key nome prazo doses
@@ -71,16 +65,12 @@ lerVacina = do
     evaluate(length conteudo)
     return conteudo
 
--- Converte IO em puro
-fromIO :: IO[String] -> [String]
-fromIO x = (unsafePerformIO x :: [String])
+------------------------------ UTIL -----------------------------
 
------------------------------- UTIL ------------------------------
 formataParaEscritaVacina :: [Vacina] -> String 
 formataParaEscritaVacina [] = []
 formataParaEscritaVacina (v:vs) = getAtributosVacina v ++ "\n" ++ formataParaEscritaVacina vs
 
-------------------- UTIL -------------------
 split :: String -> Char -> [String]
 split [] delim = [""]
 split (c:cs) delim
@@ -88,4 +78,3 @@ split (c:cs) delim
     | otherwise = (c : head rest) : tail rest
     where
         rest = split cs delim
-

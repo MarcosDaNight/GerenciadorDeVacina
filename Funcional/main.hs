@@ -61,7 +61,7 @@ telaInicial cursor = do
 
 --------------------------------TELA DE CADASTRO--------------------------------
 opcoesTelaCadastro :: [String]
-opcoesTelaCadastro = ["Realizar Cadastro De Paciente", "Cadastra Vacina", "Adiciona Vacina ao Paciente"]
+opcoesTelaCadastro = ["Cadastrar Paciente", "Cadastrar Vacina", "Cadastrar Vacina ao Paciente"]
 
 mudarTelaCadastro :: Integer -> IO ()
 mudarTelaCadastro cursor
@@ -121,13 +121,20 @@ telaOpcoesLogin cursor = do
    action <- getKey
    doOpcoesLogin cursor action
 
-
 --------------------------------VISUALIZA PACIENTE--------------------------------
 visualizaPacienteTela :: IO()
 visualizaPacienteTela = do
    system "clear"
    pacientes <- openFile "../Data/Paciente.txt" ReadMode
    listaPaciente <- lines <$> hGetContents pacientes
+   
+   putStrLn ("Digite o CPF do paciente: ")
+   cpf <- lerEntradaString
+
+   let resultado = removeItem cpf listaPaciente
+   let x = formataPaciente resultado
+
+   putStrLn x
 
    action <- getKey
    telaInicial 0
@@ -175,7 +182,7 @@ cadastraPaciente = do
    putStrLn ("\nDigite o cpf do paciente: (Apenas números)")
    cpfPaciente <- lerEntradaString
 
-   putStrLn ("\nDigite a data de nascimento do paciente: (Apenas números)")
+   putStrLn ("\nDigite a data de nascimento do paciente:")
    dataNascimento <- lerEntradaString
 
    putStrLn("\nO paciente foi cadastrado com sucesso!\n")

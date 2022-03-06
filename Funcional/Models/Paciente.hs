@@ -15,49 +15,9 @@ data Paciente = Paciente{
   vacinas :: String
 } deriving (Show, Read)
 
-data Pacientes = Pacientes{
-  pacientes :: [(String, Paciente)]
-} deriving (Show, Read)
-
------------------------------- Getters ------------------------------
+------------------------------ Getters --------------------------------
 getAtributosPaciente :: Paciente -> String
 getAtributosPaciente (Paciente {cpf = id, nomePaciente = nome, data_nascimento = nascimento, data_vacinacao = vacinacao, vacinas = dose}) = id++","++nome++","++nascimento++","++ vacinacao++","++dose
-
-getPacientes :: Pacientes -> [Paciente]
-getPacientes (Pacientes {pacientes = p}) = getPacientesData p
-
-getPacientesData :: [(String, Paciente)] -> [Paciente]
-getPacientesData [] = []
-getPacientesData ((_,d): t) = d : getPacientesData t
-
-getCpf :: Paciente -> String
-getCpf Paciente {cpf = id} = id
-
------------------------------- MapeiaCPF ------------------------------
-mapeiaCpf :: [Paciente] -> [(String, Paciente)]
-mapeiaCpf [] = []
-mapeiaCpf (c:cs) = (getCpf c, c) : mapeiaCpf cs
-
------------------------------- AdicionaVacinaAoPaciente ------------------------------
-adicionaVacina :: [Paciente] -> String -> String -> String -> [Paciente]
-adicionaVacina [] cpfPaciente dataVacinacao vacinaAplicada = []
-adicionaVacina (Paciente { cpf = c, nomePaciente = n, data_nascimento = d, data_vacinacao = dv, vacinas = v}:cs) cpfPaciente dataVacinacao vacinaAplicada
-  | c == cpfPaciente = [Paciente c n d dataVacinacao vacinaAplicada]
-  | otherwise = adicionaVacina cs cpfPaciente dataVacinacao vacinaAplicada
-
-
-
------------------------------- IOPaciente------------------------------
-escreveArquivoPaciente:: [Paciente] -> IO ()
-escreveArquivoPaciente pacientes = do
-    arq <- openFile "../Data/Paciente.txt" AppendMode  
-    hPutStr arq(formataParaEscritaPacientes pacientes)
-    hFlush arq
-    hClose arq
-
-
-
--- Leitura
 
 getPacientesEmLista :: IO [Paciente]
 getPacientesEmLista = do
@@ -65,27 +25,20 @@ getPacientesEmLista = do
     let pacientes = (converteEmListaPaciente listaPacienteStr)
     return pacientes
 
-converteEmListaPaciente :: [String] -> [Paciente]
-converteEmListaPaciente [] = []
-converteEmListaPaciente (atributo:lista) =
-    converteEmPaciente (split atributo ',') : converteEmListaPaciente lista
+------------------------------ AdicionaVacinaAoPaciente ----------------
+adicionaVacina :: [Paciente] -> String -> String -> String -> [Paciente]
+adicionaVacina [] cpfPaciente dataVacinacao vacinaAplicada = []
+adicionaVacina (Paciente { cpf = c, nomePaciente = n, data_nascimento = d, data_vacinacao = dv, vacinas = v}:cs) cpfPaciente dataVacinacao vacinaAplicada
+  | c == cpfPaciente = [Paciente c n d dataVacinacao vacinaAplicada]
+  | otherwise = adicionaVacina cs cpfPaciente dataVacinacao vacinaAplicada
 
-
-converteEmPaciente :: [String] -> Paciente
-converteEmPaciente paciente = Paciente cpf nomePaciente data_nascimento data_vacinacao vacina
-    where
-        cpf = paciente !! 0
-        nomePaciente = paciente !! 1
-        data_nascimento = paciente !! 2
-        data_vacinacao = paciente !! 3
-        vacina = paciente !! 4
-
-lerPaciente :: IO[String]
-lerPaciente = do
-    arq <- openFile "../Data/Paciente.txt" ReadMode 
-    conteudo <- lines <$> hGetContents arq
-    evaluate(length conteudo)
-    return conteudo
+------------------------------ IOPaciente ------------------------------
+escreveArquivoPaciente:: [Paciente] -> IO ()
+escreveArquivoPaciente pacientes = do
+    arq <- openFile "../Data/Paciente.txt" AppendMode  
+    hPutStr arq(formataParaEscritaPacientes pacientes)
+    hFlush arq
+    hClose arq
 
 ------------------- UTIL -------------------
 formataParaEscritaPacientes :: [Paciente] -> String
@@ -105,6 +58,11 @@ pegaIdVacinaPaciente:: [String] -> String
 pegaIdVacinaPaciente [] = ""
 pegaIdVacinaPaciente (x:xs) = last(quebraString(x)) ++ pegaIdVacinaPaciente xs
 
+formataPaciente :: [String] -> String
+formataPaciente [] = ""
+formataPaciente (c:cs) = "Nome: " ++ (t !! 1) ++ " | CPF: " ++ (t !! 0) ++ " | ID da Vacina Tomada: " ++ (t !! 4) ++ "\n" ++ formataPaciente cs
+   where
+      t = quebraString c
 
 isolaCpf:: [Char] -> String
 isolaCpf paciente = head(split paciente ',' )
@@ -119,3 +77,23 @@ removeItem _ []                 = []
 removeItem x (y:ys) | x /= isolaCpf y    = removeItem x ys
                     | otherwise = y : removeItem x ys
 
+converteEmListaPaciente :: [String] -> [Paciente]
+converteEmListaPaciente [] = []
+converteEmListaPaciente (atributo:lista) =
+    converteEmPaciente (split atributo ',') : converteEmListaPaciente lista
+
+converteEmPaciente :: [String] -> Paciente
+converteEmPaciente paciente = Paciente cpf nomePaciente data_nascimento data_vacinacao vacina
+    where
+        cpf = paciente !! 0
+        nomePaciente = paciente !! 1
+        data_nascimento = paciente !! 2
+        data_vacinacao = paciente !! 3
+        vacina = paciente !! 4
+
+lerPaciente :: IO[String]
+lerPaciente = do
+    arq <- openFile "../Data/Paciente.txt" ReadMode 
+    conteudo <- lines <$> hGetContents arq
+    evaluate(length conteudo)
+    return conteudo
