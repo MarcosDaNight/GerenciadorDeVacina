@@ -135,7 +135,7 @@ visualizaPacienteTela = do
 
 
 --Unica solução que encontrei aqui por enquanto ofr receber char e string já que as funções que uso tem entradas diferentes
-checaSePodeCadastrar:: Char -> String -> String -> IO()
+checaSePodeCadastrar:: Char -> String -> String -> IO Bool
 checaSePodeCadastrar idVacina idVacinaTbm cpf = do
    system "clear"
    pacientes <- openFile "../Data/Paciente.txt" ReadMode
@@ -146,9 +146,8 @@ checaSePodeCadastrar idVacina idVacinaTbm cpf = do
    let pegaDosesMaximas = getVacinaDoses idVacinaTbm
    let numero = length removeIdsDiferentes
    let dosesMaximas = read pegaDosesMaximas :: Int
-   print( numero < dosesMaximas)
-
-
+   let result = numero < dosesMaximas
+   return result
 
 quebraString:: [Char] -> [String]
 quebraString palavra = split palavra ','
