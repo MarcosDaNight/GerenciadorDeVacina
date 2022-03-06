@@ -131,8 +131,12 @@ visualizaPacienteTela = do
    putStrLn ("Digite o CPF do paciente: ")
    cpf <- lerEntradaString
 
+   hSetBuffering stdin NoBuffering
+   hSetEcho stdin False
+
    let resultado = removeItem cpf listaPaciente
-   let x = formataPaciente resultado
+   let listaFinal = tail resultado
+   let x = formataPaciente listaFinal
 
    putStrLn x
 
@@ -149,7 +153,7 @@ cadastraVacina = do
    putStrLn ("\nDigite o nome da vacina:")
    nomeVacina <- lerEntradaString
 
-   putStrLn ("\nDigite o prazo da vacina em meses: (Apenas números)")
+   putStrLn ("\nDigite o prazo para proxima dose da vacina em meses: (Apenas números)")
    prazoVacina <- lerEntradaString
 
    putStrLn ("\nDigite a quantidade de doses da vacina: (Apenas números)")

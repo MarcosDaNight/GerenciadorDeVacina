@@ -23,6 +23,13 @@ getVacinaDoses idVacina = do
     let letra = head d
     return letra
 
+getVacinaNome :: String -> [String]
+getVacinaNome idVacina = do
+    let listaVacinas = getVacinasEmLista
+    let Vacina {key = k, nome = n, prazo = p, doses = d} = getVacinaByID (unsafePerformIO getVacinasEmLista) idVacina 
+    let nomeVacina = n
+    return nomeVacina
+
 getVacinasEmLista :: IO [Vacina]
 getVacinasEmLista = do
     listaVacinaStr <- lerVacina

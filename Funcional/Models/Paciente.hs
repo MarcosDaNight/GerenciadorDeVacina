@@ -60,9 +60,14 @@ pegaIdVacinaPaciente (x:xs) = last(quebraString(x)) ++ pegaIdVacinaPaciente xs
 
 formataPaciente :: [String] -> String
 formataPaciente [] = ""
-formataPaciente (c:cs) = "Nome: " ++ (t !! 1) ++ " | CPF: " ++ (t !! 0) ++ " | ID da Vacina Tomada: " ++ (t !! 4) ++ "\n" ++ formataPaciente cs
+formataPaciente (c:cs) = "Nome: " ++ (t !! 1) ++ " | CPF: " ++ (t !! 0) ++ " | Vacina Tomada: " ++ nomeVacina ++ "\n" ++ formataPaciente cs
    where
       t = quebraString c
+      nomeVacina = get1st (getVacinaNome (t !! 4))
+
+get1st:: [String] -> String
+get1st [] = ""
+get1st (x:xs) = x
 
 isolaCpf:: [Char] -> String
 isolaCpf paciente = head(split paciente ',' )
