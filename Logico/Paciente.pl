@@ -19,8 +19,8 @@ exibirPacientesAux([H|T]) :-
 	write("Data de Vacinacao:"), writeln(H.dataVacinacao), nl,
 	write("Vacina:"), writeln(H.vacina), nl, exibirPacientesAux(T).
 
-exibirPacientes(FilePath) :-
-		lerJSON(FilePath, T),
+exibirPacientes() :-
+		lerJSON("/home/marcosgdn/Documentos/PLP/GerenciadorDeVacina/Data/paciente.json", T),
 		exibirPacientesAux(T).
 
 % Regras para listar um Paciente
