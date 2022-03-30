@@ -27,7 +27,7 @@ exibirVacinas(FilePath) :-
 % Regra para listar uma vacina
 exibirVacinaAux([H|T], Id) :- H.id \= Id, exibirVacinaAux(T, Id).
 exibirVacinaAux([H|T], Id) :- H.id =:= Id, exibirVacinaString(H, Id).
-exibirVacinaString(H, Id) : nl,
+exibirVacinaString(H, Id) :- nl,
     write("ID:"), writeln(H.id), nl,
     write("Nome da Vacina:"), writeln(H.nomeVacina), nl,
     write("Data da vacinacao:"), writeln(H.dataVacinacao), nl,
@@ -39,14 +39,14 @@ exibirVacina(FilePath, Id) :-
     exibirVacinaAux(T, Id).
 
 % Criando uma representação em string para uma vacina em JSON
-vacinaToJSON(ID, NomeVacina, DataVacinacao, QuantidadeDeDoses, Out) :-
-    swritef(Out, '{"id":"%w", "nomeVacina": "%w", "dataVacinacao": "%w", "quantidadeDeDoses": "%w"',[ID, NomeVacina, DataVacinacao, QuantidadeDeDoses]).
+vacinaToJSON(Id, NomeVacina, DataVacinacao, QuantidadeDeDoses, Out) :-
+    swritef(Out, '{"id":"%w", "nomeVacina": "%w", "dataVacinacao": "%w", "quantidadeDeDoses": "%w"',[Id, NomeVacina, DataVacinacao, QuantidadeDeDoses]).
 
 % Convertendo uma lista de objetos para JSON
 vacinasToJSON([], []).
 vacinasToJSON([H|T], [X|Out]) :-
     vacinaToJSON(H.id, H.nomeVacina, H.dataVacinacao, H.quantidadeDeDoses, X),
-    vacinaToJSON(T, Out)
+    vacinaToJSON(T, Out).
 
 % Salvando em JSON
 salvarVacina(FilePath, Id, NomeVacina, DataVacinacao, QuantidadeDeDoses) :-
@@ -71,13 +71,13 @@ editarNomeVacina(FilePath, IdVacina, NovoNome) :-
 
 % Alterando data de uma Vacina
 editarDataVacinaoJSON([], _, _, []).
-editarDataVacinaoJSON([H|T], H.id, DataVacinao, [_{id:H.id, nomeVacina: H.nomeVacina, dataVacinao:data, DataVacinaocao:DataVacinao, quantidadeDeDoses:H.quantidadeDeDoses}|T]).
+editarDataVacinaoJSON([H|T], H.id, DataVacinao, [_{id:H.id, nomeVacina: H.nomeVacina, dataVacinao:DataVacinao, quantidadeDeDoses:H.quantidadeDeDoses}|T]).
 editarDataVacinaoJSON([H|T], Id, DataVacinacao, [H|Out]) :-
     editarDataVacinaoJSON(T, Id, DataVacinacao, Out).
 
-editarDataVacinao(FilePath, IdVacina, Novadata) :-
+editarDataVacinao(FilePath, IdVacina, NovaData) :-
     lerJSON(FilePath, File),
-    editarDataVacinaoJSON(File, IdVacina, NovoData, SaidaParcial),
+    editarDataVacinaoJSON(File, IdVacina, NovaData, SaidaParcial),
     vacinasToJSON(SaidaParcial, Saida),
     open(FilePath, write, Stream), write(Stream, Saida), close(Stream).
 
@@ -85,13 +85,13 @@ editarDataVacinao(FilePath, IdVacina, Novadata) :-
 
 % Alterando quantidade de doses de uma Vacina
 editarQuantidadeDeDosesJSON([], _, _, []).
-editarQuantidadeDeDosesJSON([H|T], H.id, QuantidadeDeDoses, [_{id:H.id, nomeVacina: H.nomeVacina, dataVacinao:H.dataVacinacao, quantidadeDeDoses:H.quantidadeDeDoses}|T]).
+editarQuantidadeDeDosesJSON([H|T], H.id, QuantidadeDeDoses, [_{id:H.id, nomeVacina: H.nomeVacina, dataVacinao:H.dataVacinacao, quantidadeDeDoses:QuantidadeDeDoses}|T]).
 editarQuantidadeDeDosesJSON([H|T], Id, QuantidadeDeDoses, [H|Out]) :-
-    editarDataVacinaoJSON(T, Id, QuantidadeDeDoses, Out).
+    editarQuantidadeDeDosesJSON(T, Id, QuantidadeDeDoses, Out).
 
-editarDataVacinao(FilePath, IdVacina, NovaQuantidade) :-
+editarQuantidadeDeDoses(FilePath, IdVacina, NovaQuantidade) :-
     lerJSON(FilePath, File),
-    editarDataVacinaoJSON(File, IdVacina, NovaQuantidade, SaidaParcial),
+    editarQuantidadeDeDosesJSON(File, IdVacina, NovaQuantidade, SaidaParcial),
     vacinasToJSON(SaidaParcial, Saida),
     open(FilePath, write, Stream), write(Stream, Saida), close(Stream).
 
