@@ -89,7 +89,7 @@ doMainScreen(Cursor, Action) :-
                        Cursor =:= 2 -> showExitMessage());
      mainScreen(Cursor)).
 
-menu('\nBEM VINDO À
+menu('
     \n
 ███████╗██╗   ██╗███████╗██╗   ██╗ █████╗  ██████╗██╗███╗   ██╗ █████╗ 
 ██╔════╝██║   ██║██╔════╝██║   ██║██╔══██╗██╔════╝██║████╗  ██║██╔══██╗
@@ -98,9 +98,9 @@ menu('\nBEM VINDO À
 ███████║╚██████╔╝███████║ ╚████╔╝ ██║  ██║╚██████╗██║██║ ╚████║██║  ██║
 ╚══════╝ ╚═════╝ ╚══════╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝
 ╔══════════════════════════════╗
-║  (w,s) Para mover o cursor   ║
+║  (w,s) W: cima    S: baixo   ║
 ║  (a) Para modificar a tela   ║
-║  (d) Para entrar nas opcoes  ║
+║  (d) Selecionar opção        ║
 ╚══════════════════════════════╝\n').
 
 mainScreen(Cursor) :-
@@ -151,16 +151,15 @@ adicionaVacinaAoPaciente() :-
     shell(clear),
     getString(Cpf, 'Insira o CPF do paciente: '),
     getString(Id, 'Insira o Id da vacina: '),
-    getNomeVacina(IdVacina, Vacina),
-    getDosesVacina(IdVacina, Doses),
-    adicionaVacinaAoPaciente(IdPaciente, Vacina, Doses),
-    write('\nPaciente foi cadastrado!'),
+    getVacina(Id, Vacina),
+    getPaciente(Cpf, Paciente),
+    registrandoVacinaAoPaciente(Paciente, Vacina),
     get_single_char(Action),
     mainScreen(0).
 
 % ---------------------------------------------TELA OPCOES ADMINISTRADOR-----------------------------------------------------------
 opcoesAdministrador(['Visualizar Pacientes', 'Vizualizar Vacinas', 'Cadastrar Paciente', 'Cadastrar Vacina', 'Registrar Vacinação']).
-limitAdministrador(3).
+limitAdministrador(4).
 
 doAdministradorTela(Cursor, Action) :-
     limitAdministrador(Limit),
@@ -170,7 +169,8 @@ doAdministradorTela(Cursor, Action) :-
      right(Action) -> (Cursor =:= 0 -> vizualizarPacientes();
                        Cursor =:= 1 -> vizualizarVacinas();
                        Cursor =:= 2 -> cadastraPaciente();
-                       Cursor =:= 3 -> cadastraVacina());
+                       Cursor =:= 3 -> cadastraVacina();
+                       Cursor =:= 4 -> adicionaVacinaAoPaciente());
      administradorTela(Cursor)).
 
 administradorTela(Cursor) :-
@@ -181,31 +181,6 @@ administradorTela(Cursor) :-
     showOptions(ListaOpcoes, Cursor, 0),
     get_single_char(Action),
     doAdministradorTela(Cursor, Action).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

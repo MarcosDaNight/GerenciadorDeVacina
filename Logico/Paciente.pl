@@ -70,9 +70,9 @@ editarNomePaciente(IdPaciente, NovoNome) :-
 
 % Adicionando Vacina ao paciente
 adicionaVacinaAoPacienteJSON([], _, _, _, []).
-adicionaVacinaAoPacienteJSON([H|T], H.id, Vacina, QtdDoses, [_{id:H.id, nomePaciente:H.nomePaciente, dataNascimento:H.dataNascimento, dataVacinacao:H.dataVacinacao, vacina:Vacina, quantidadeDeDoses:H.quantidadeDeDoses}|T]).
-adicionaVacinaAoPacienteJSON([H|T], Id, Vacina, [H|Out]) :- 
-		adicionaVacinaAoPacienteJSON(T, Id, Vacina, Out).
+adicionaVacinaAoPacienteJSON([H|T], H.id, Vacina, QtdDoses, [_{id:H.id, nomePaciente:H.nomePaciente, dataNascimento:H.dataNascimento, dataVacinacao:H.dataVacinacao, vacina:Vacina, quantidadeDeDoses:QtdDoses}|T]).
+adicionaVacinaAoPacienteJSON([H|T], Id, Vacina, QtdDoses, [H|Out]) :- 
+		adicionaVacinaAoPacienteJSON(T, Id, Vacina, QtdDoses, Out).
 
 adicionaVacinaAoPaciente(IdPaciente, Vacina, QtdDoses) :-
 		lerJSON("../Data/paciente.json", File),
@@ -91,10 +91,9 @@ removerPaciente(Id) :-
    pacientesToJSON(SaidaParcial, Saida),
    open("../Data/paciente.json", write, Stream), write(Stream, Saida), close(Stream).
 
-getPaciente(IdPaciente) :-
+getPaciente(IdPaciente, SaidaParcial) :-
 	lerJSON("../Data/paciente.json", File),
-	getPacienteJSON(File, IdPaciente, SaidaParcial),
-	write(SaidaParcial.quantidadeDeDoses).
+	getPacienteJSON(File, IdPaciente, SaidaParcial).
 
 % Mudando o nome de um Paciente
 getPacienteJSON([], _, _).
@@ -102,13 +101,18 @@ getPacienteJSON([H|T], H.id, H).
 getPacienteJSON([H|T], Id, Out) :- 
 		getPacienteJSON(T, Id, Out).
 
-% Pegando quantidade de doses da vacina
-getDosesJSON([], _,_).
-getDosesJSON([H|T], H.id, H.quantidadeDeDoses).
-getDosesJSON([H|T], Id, Out) :-
-    getDosesJSON(T, Id, Out).
 
-getDoses(Id, SaidaParcial):-
-    lerJSON("../Data/paciente.json", File),
-    getDosesJSON(File, Id, SaidaParcial),
-	write(SaidaParcial).
+% Registrando vacina ao paciente
+registrandoVacinaAoPaciente(Paciente, Vacina):- 
+	Paciente.quantidadeDeDoses =:=  Vacina.quantidadeDeDoses,
+	write("Paciente já tomou todas as doses\n").
+
+registrandoVacinaAoPaciente(Paciente, Vacina):-
+	Paciente.quantidadeDeDoses < Vacina.quantidadeDeDoses,
+	incrementaQtnDeDoses(Paciente.quantidadeDeDoses, R),
+	adicionaVacinaAoPaciente(Paciente.id, Vacina.nomeVacina, R),
+	write("Dose aplicada ao paciente!\n").
+
+
+incrementaQtnDeDoses(A, R):-
+	R is A+1.

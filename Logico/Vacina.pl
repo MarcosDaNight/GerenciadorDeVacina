@@ -78,22 +78,12 @@ removerVacinaJSON([], _, []).
 removerVacinaJSON([H|T], H.id, T).
 removerVacinaJSON([H|T], Id, [H|Out]) :- removerVacinaJSON(T, Id, Out).
 
-% pegando o nome da vacina
-getNomeVacinaJSON([], _,_).
-getNomeVacinaJSON([H|T], H.id, H.nomeVacina).
-getNomeVacinaJSON([H|T], Id, Out) :-
-    getNomeVacinaJSON(T, Id, Out).
+getVacina(IdVacina, SaidaParcial) :-
+	lerJSON("../Data/vacina.json", File),
+	getVacinaJSON(File, IdVacina, SaidaParcial).
 
-getNomeVacina(IdVacina, SaidaParcial):-
-    lerJSON("../Data/vacina.json", File),
-    getNomeVacinaJSON(File, IdVacina, SaidaParcial).
-
-% Pegando quantidade de doses da vacina
-getDosesVacinaJSON([], _,_).
-getDosesVacinaJSON([H|T], H.id, H.quantidadeDeDoses).
-getDosesVacinaJSON([H|T], Id, Out) :-
-    getDosesVacinaJSON(T, Id, Out).
-
-getDosesVacina(IdVacina, SaidaParcial):-
-    lerJSON("../Data/vacina.json", File),
-    getDosesVacinaJSON(File, IdVacina, SaidaParcial).
+% Mudando o nome de um Vacina
+getVacinaJSON([], _, _).
+getVacinaJSON([H|T], H.id, H).
+getVacinaJSON([H|T], Id, Out) :- 
+		getVacinaJSON(T, Id, Out).
