@@ -126,11 +126,41 @@ vizualizarVacinas() :-
     exibirVacinas(),
     get_single_char(Action),
     mainScreen(0).
+% ---------------------------------------- TELA CADASTRAR PACIENTE ---------------------------------------
+cadastraPaciente() :-
+    shell(clear),
+    getString(Cpf, 'Insira o CPF do paciente: '),
+    getString(Nome, 'Insira o nome do paciente: '),
+    getString(DataNascimento, 'Insira a data de nascimento do paciente: '),
+    salvarPaciente(Cpf, Nome, DataNascimento, "", ""),
+    write('\nPaciente foi cadastrado!'),
+    get_single_char(Action),
+    mainScreen(0).
+%  ---------------------------------------- TELA CADASTRAR VACINA ---------------------------------------
+cadastraVacina() :-
+    shell(clear),
+    getString(Id, 'Insira o ID da vacina: '),
+    getString(Nome, 'Insira o nome da vacina: '),
+    getString(QuantidadeDeDoses, 'Insira a quantidade de doses da vacina: '),
+    salvarVacina(Id, Nome, QuantidadeDeDoses),
+    write('\nPaciente foi cadastrado!'),
+    get_single_char(Action),
+    mainScreen(0).
+%  ---------------------------------------- TELA ATRIBUIR VACINA A PACIENTE ---------------------------------------
+adicionaVacinaAoPaciente() :-
+    shell(clear),
+    getString(Cpf, 'Insira o CPF do paciente: '),
+    getString(Id, 'Insira o Id da vacina: '),
+    getNomeVacina(IdVacina, Vacina),
+    getDosesVacina(IdVacina, Doses),
+    adicionaVacinaAoPaciente(IdPaciente, Vacina, Doses),
+    write('\nPaciente foi cadastrado!'),
+    get_single_char(Action),
+    mainScreen(0).
 
 % ---------------------------------------------TELA OPCOES ADMINISTRADOR-----------------------------------------------------------
-
-opcoesAdministrador(['Visualizar Pacientes', 'Vizualizar Vacinas']).
-limitAdministrador(1).
+opcoesAdministrador(['Visualizar Pacientes', 'Vizualizar Vacinas', 'Cadastrar Paciente', 'Cadastrar Vacina', 'Registrar Vacinação']).
+limitAdministrador(3).
 
 doAdministradorTela(Cursor, Action) :-
     limitAdministrador(Limit),
@@ -138,10 +168,10 @@ doAdministradorTela(Cursor, Action) :-
      down(Action) -> downAction(Cursor, Limit, NewCursor), administradorTela(NewCursor);
      left(Action) -> mainScreen(Cursor);
      right(Action) -> (Cursor =:= 0 -> vizualizarPacientes();
-                       Cursor =:= 1 -> vizualizarVacinas());
+                       Cursor =:= 1 -> vizualizarVacinas();
+                       Cursor =:= 2 -> cadastraPaciente();
+                       Cursor =:= 3 -> cadastraVacina());
      administradorTela(Cursor)).
-
-
 
 administradorTela(Cursor) :-
     shell(clear),
