@@ -1,12 +1,15 @@
-## GerenciadorDeVacina
+<img src="https://i.imgur.com/pAqRIQk.png" alt="logo1" align="right" style="height: 100px; width:100px;"/> <img src="https://imgur.com/XcEOFuW.png" align="right" alt="logo2" style="height: 100px; width:100px;"/>
+
+
+## GerenciadorDeVacina :hospital:
 Repositório para o projeto da Disciplina de PLP
-#### Descrição:
+#### Descrição :pencil:
 > O gerenciador de vacinas permite o cadastro dos pacientes e das vacinas tomadas. Dessa forma, é possível ter o controle das doses que estão sendo aplicadas evitando que pacientes tomem doses desnecessárias. Além disso, é possível também que os pacientes consigam visualizar qual vacina tomaram.
 
-#### Demonstração:
+#### Demonstração :computer:
 - Funcional: [Vídeo Funcional](https://youtu.be/ODa13h3eF4o)
 - Lógico: [Vídeo Lógico](https://youtu.be/zavmHjDfTu4)
-#### Funcionalidades:
+#### Funcionalidades (menu do projeto Haskell) :heavy_check_mark:
 - Cadastro dos pacientes:
   > Entrando como admin, o cadastro é feito a partir do nome do paciente, CPF e data de nasciemento.
   ```
