@@ -164,7 +164,7 @@ vizualizarCartao() :-
     write('
     ╔══════════════════════════════╗
     ║  BEM VINDO A AREA PACIENTE   ║
-    ║       INSIRA SEU CPF         ║
+    ║       INSIRA SEU ID          ║
     ║          SUSVACINA           ║
     ╚══════════════════════════════╝\n'),
     getString(Cpf, 'Insira o Id do paciente: '),
