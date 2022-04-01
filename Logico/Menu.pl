@@ -85,11 +85,11 @@ doMainScreen(Cursor, Action) :-
      down(Action) -> downAction(Cursor, Limit, NewCursor), mainScreen(NewCursor);
      left(Action) -> showExitMessage();
      right(Action) -> (Cursor =:= 0 -> administradorTela(0);
-                       Cursor =:= 1 -> administradorTela(0);
+                       Cursor =:= 1 -> pacienteTela(0);
                        Cursor =:= 2 -> showExitMessage());
      mainScreen(Cursor)).
 
-menu('\nBEM VINDO À
+menu('
     \n
 ███████╗██╗   ██╗███████╗██╗   ██╗ █████╗  ██████╗██╗███╗   ██╗ █████╗ 
 ██╔════╝██║   ██║██╔════╝██║   ██║██╔══██╗██╔════╝██║████╗  ██║██╔══██╗
@@ -98,9 +98,9 @@ menu('\nBEM VINDO À
 ███████║╚██████╔╝███████║ ╚████╔╝ ██║  ██║╚██████╗██║██║ ╚████║██║  ██║
 ╚══════╝ ╚═════╝ ╚══════╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝
 ╔══════════════════════════════╗
-║  (w,s) Para mover o cursor   ║
+║  (w,s) W: cima    S: baixo   ║
 ║  (a) Para modificar a tela   ║
-║  (d) Para entrar nas opcoes  ║
+║  (d) Selecionar opção        ║
 ╚══════════════════════════════╝\n').
 
 mainScreen(Cursor) :-
@@ -120,7 +120,7 @@ vizualizarPacientes() :-
     get_single_char(Action),
     mainScreen(0).
 
-% ---------------------------------------- TELA VISUALIZAR VACINAS ---------------------------------------
+% ---------------------------------------- TELA VISUALIZAR VACINA ---------------------------------------
 vizualizarVacinas() :-
     shell(clear),
     exibirVacinas(),
@@ -132,7 +132,7 @@ cadastraPaciente() :-
     getString(Cpf, 'Insira o CPF do paciente: '),
     getString(Nome, 'Insira o nome do paciente: '),
     getString(DataNascimento, 'Insira a data de nascimento do paciente: '),
-    salvarPaciente(Cpf, Nome, DataNascimento, "", ""),
+    salvarPaciente(Cpf, Nome, DataNascimento, "", "", 0),
     write('\nPaciente foi cadastrado!'),
     get_single_char(Action),
     mainScreen(0).
@@ -142,8 +142,9 @@ cadastraVacina() :-
     getString(Id, 'Insira o ID da vacina: '),
     getString(Nome, 'Insira o nome da vacina: '),
     getString(QuantidadeDeDoses, 'Insira a quantidade de doses da vacina: '),
-    salvarVacina(Id, Nome, QuantidadeDeDoses),
-    write('\nPaciente foi cadastrado!'),
+    getString(Intervalo, 'Insira o intervalo da(s) dose(s) em dias: '),
+    salvarVacina(Id, Nome, QuantidadeDeDoses, Intervalo),
+    write('\nVacina foi cadastrada!'),
     get_single_char(Action),
     mainScreen(0).
 %  ---------------------------------------- TELA ATRIBUIR VACINA A PACIENTE ---------------------------------------
@@ -151,16 +152,29 @@ adicionaVacinaAoPaciente() :-
     shell(clear),
     getString(Cpf, 'Insira o CPF do paciente: '),
     getString(Id, 'Insira o Id da vacina: '),
-    getNomeVacina(IdVacina, Vacina),
-    getDosesVacina(IdVacina, Doses),
-    adicionaVacinaAoPaciente(IdPaciente, Vacina, Doses),
-    write('\nPaciente foi cadastrado!'),
+    getString(Data, 'Insira a data de hoje: '),
+    getVacina(Id, Vacina),
+    getPaciente(Cpf, Paciente),
+    registrandoVacinaAoPaciente(Paciente, Vacina, Data),
+    get_single_char(Action),
+    mainScreen(0).
+% ---------------------------------------- TELA VISUALIZAR CARTÃO DE VACINAÇÃO ---------------------------------------
+vizualizarCartao() :-
+    shell(clear),
+    write('
+    ╔══════════════════════════════╗
+    ║  BEM VINDO A AREA PACIENTE   ║
+    ║       INSIRA SEU CPF         ║
+    ║          SUSVACINA           ║
+    ╚══════════════════════════════╝\n'),
+    getString(Cpf, 'Insira o CPF do paciente: '),
+    exibirPaciente(Cpf),
     get_single_char(Action),
     mainScreen(0).
 
 % ---------------------------------------------TELA OPCOES ADMINISTRADOR-----------------------------------------------------------
 opcoesAdministrador(['Visualizar Pacientes', 'Vizualizar Vacinas', 'Cadastrar Paciente', 'Cadastrar Vacina', 'Registrar Vacinação']).
-limitAdministrador(3).
+limitAdministrador(4).
 
 doAdministradorTela(Cursor, Action) :-
     limitAdministrador(Limit),
@@ -170,7 +184,8 @@ doAdministradorTela(Cursor, Action) :-
      right(Action) -> (Cursor =:= 0 -> vizualizarPacientes();
                        Cursor =:= 1 -> vizualizarVacinas();
                        Cursor =:= 2 -> cadastraPaciente();
-                       Cursor =:= 3 -> cadastraVacina());
+                       Cursor =:= 3 -> cadastraVacina();
+                       Cursor =:= 4 -> adicionaVacinaAoPaciente());
      administradorTela(Cursor)).
 
 administradorTela(Cursor) :-
@@ -182,34 +197,27 @@ administradorTela(Cursor) :-
     get_single_char(Action),
     doAdministradorTela(Cursor, Action).
 
+% ---------------------------------------------TELA OPCOES PACIENTE-----------------------------------------------------------
+opcoesPaciente(['Visualizar Cartão de Vacinação', 'Visualizar Características da Vacina']).
+limitPaciente(1).
 
+doPacienteTela(Cursor, Action) :-
+    limitPaciente(Limit),
+    (up(Action) -> upAction(Cursor, Limit, NewCursor), pacienteTela(NewCursor);
+     down(Action) -> downAction(Cursor, Limit, NewCursor), pacienteTela(NewCursor);
+     left(Action) -> mainScreen(Cursor);
+     right(Action) -> (Cursor =:= 0 -> vizualizarCartao(); 
+                       Cursor =:= 1 -> vizualizarVacinas());
+     pacienteTela(Cursor)).
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+pacienteTela(Cursor) :-
+    shell(clear),
+    menu(X),
+    writeln(X),
+    opcoesPaciente(ListaOpcoes),
+    showOptions(ListaOpcoes, Cursor, 0),
+    get_single_char(Action),
+    doPacienteTela(Cursor, Action).
 
 main :-
     mainScreen(0),
