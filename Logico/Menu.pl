@@ -129,7 +129,7 @@ vizualizarVacinas() :-
 % ---------------------------------------- TELA CADASTRAR PACIENTE ---------------------------------------
 cadastraPaciente() :-
     shell(clear),
-    getString(Cpf, 'Insira o CPF do paciente: '),
+    getString(Cpf, 'Insira o Id do paciente: '),
     getString(Nome, 'Insira o nome do paciente: '),
     getString(DataNascimento, 'Insira a data de nascimento do paciente: '),
     salvarPaciente(Cpf, Nome, DataNascimento, "", "", 0),
@@ -139,7 +139,7 @@ cadastraPaciente() :-
 %  ---------------------------------------- TELA CADASTRAR VACINA ---------------------------------------
 cadastraVacina() :-
     shell(clear),
-    getString(Id, 'Insira o ID da vacina: '),
+    getString(Id, 'Insira o Id da vacina: '),
     getString(Nome, 'Insira o nome da vacina: '),
     getString(QuantidadeDeDoses, 'Insira a quantidade de doses da vacina: '),
     getString(Intervalo, 'Insira o intervalo da(s) dose(s) em dias: '),
@@ -150,7 +150,7 @@ cadastraVacina() :-
 %  ---------------------------------------- TELA ATRIBUIR VACINA A PACIENTE ---------------------------------------
 adicionaVacinaAoPaciente() :-
     shell(clear),
-    getString(Cpf, 'Insira o CPF do paciente: '),
+    getString(Cpf, 'Insira o Id do paciente: '),
     getString(Id, 'Insira o Id da vacina: '),
     getString(Data, 'Insira a data de hoje: '),
     getVacina(Id, Vacina),
@@ -167,7 +167,7 @@ vizualizarCartao() :-
     ║       INSIRA SEU CPF         ║
     ║          SUSVACINA           ║
     ╚══════════════════════════════╝\n'),
-    getString(Cpf, 'Insira o CPF do paciente: '),
+    getString(Cpf, 'Insira o Id do paciente: '),
     exibirPaciente(Cpf),
     get_single_char(Action),
     mainScreen(0).
