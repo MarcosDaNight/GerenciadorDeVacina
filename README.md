@@ -2,6 +2,10 @@
 Repositório para o projeto da Disciplina de PLP
 #### Descrição:
 > O gerenciador de vacinas permite o cadastro dos pacientes e das vacinas tomadas. Dessa forma, é possível ter o controle das doses que estão sendo aplicadas evitando que pacientes tomem doses desnecessárias. Além disso, é possível também que os pacientes consigam visualizar qual vacina tomaram.
+
+#### Demonstração:
+- Funcional: [Vídeo Funcional](https://youtu.be/ODa13h3eF4o)
+- Lógico: [Vídeo Lógico](https://youtu.be/zavmHjDfTu4)
 #### Funcionalidades:
 - Cadastro dos pacientes:
   > Entrando como admin, o cadastro é feito a partir do nome do paciente, CPF e data de nasciemento.
